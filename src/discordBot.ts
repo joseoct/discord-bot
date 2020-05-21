@@ -1,6 +1,7 @@
 import { Client } from 'discord.js';
 import Musix from './music-quiz/implementations/Musix';
 import config from './discordConfig/config';
+import Play from './music-quiz/implementations/commands/Play';
 
 export default class DiscordBot {
   private client: Client;
@@ -8,6 +9,8 @@ export default class DiscordBot {
   private prefix = config.prefix;
 
   private token = config.token;
+
+  private musix = new Musix();
 
   constructor() {
     this.client = new Client();
@@ -21,10 +24,18 @@ export default class DiscordBot {
     });
 
     this.client.on('message', message => {
-      if (message.content.startsWith(`${this.prefix}sq`)) {
-        const musix = new Musix();
+      if (message.author.bot) return;
 
-        musix.run(message);
+      const flag = Play.getMusixFlag();
+
+      if (flag) {
+        this.musix.verifyMusicAndArtist(message);
+      }
+
+      if (message.content.startsWith(`${this.prefix}sq`)) {
+        this.musix.run(message);
+
+        Play.setMusixFlag(true);
       }
     });
   }
