@@ -1,5 +1,7 @@
 import { StreamDispatcher } from 'discord.js';
 import ytdl from 'ytdl-core';
+import ffmpeg from 'fluent-ffmpeg';
+import fs from 'fs';
 
 import ISongDTO from '../../dtos/ISongDTO';
 
@@ -48,14 +50,30 @@ class Play {
       return;
     }
 
-    const currentSong = ytdl(song.url, {
-      quality: 'lowestaudio',
-    });
+    const currentSong = fs.createWriteStream('video.mp3');
+
+    ffmpeg()
+      .input(
+        ytdl(song.url, {
+          filter: 'audioonly',
+        }),
+      )
+      .format('mp3')
+      .seekInput(120)
+      .duration(30)
+      .pipe(currentSong);
 
     const participants = Participants.getParticipants();
 
     const dispatcher: StreamDispatcher = connection
-      .play(currentSong)
+      .play(
+        ytdl(song.url, {
+          filter: 'audioonly',
+        }),
+        {
+          seek: 50,
+        },
+      )
       .on('finish', () => {
         textChannel.send({
           embed: {
@@ -79,6 +97,10 @@ class Play {
         queueConstruct.songs.shift();
         this.playSong(queueConstruct);
       });
+
+    setTimeout(() => {
+      dispatcher.end();
+    }, 30000);
 
     dispatcher.setVolumeLogarithmic(queueConstruct.volume / 5);
   }

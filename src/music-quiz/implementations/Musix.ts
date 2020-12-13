@@ -21,18 +21,18 @@ class Musix {
       voiceChannel: null,
       connection: undefined,
       songs: [],
-      volume: 0,
+      volume: 5,
       playing: true,
     };
 
     this.musics = [
       {
-        title: 'Taylor Swift - Look What You Made Me Do',
-        url: 'https://www.youtube.com/watch?v=IGQBtbKSVhY',
+        title: 'T - L',
+        url: 'https://www.youtube.com/watch?v=iZq0u3quAqo',
       },
       {
-        title: 'Katy Perry - Bon Appétit',
-        url: 'https://www.youtube.com/watch?v=IGQBtbKSVhY',
+        title: 'K - B',
+        url: 'https://www.youtube.com/watch?v=jHs9VKS_DGg',
       },
     ];
 
@@ -50,7 +50,7 @@ class Musix {
 
     const textChannel = message.channel;
 
-    if (!voiceChannel) {
+    if (!textChannel) {
       message.channel.send('ENTRA AI PORRA');
     }
 
