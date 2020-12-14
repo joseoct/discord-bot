@@ -1,69 +1,67 @@
 import { Message } from 'discord.js';
-import Play from './commands/Play';
+import Commands from './commands/Commands';
 
-import ISongDTO from '../dtos/ISongDTO';
 import IQueueConstructor from '../models/IQueueConstructor';
-import removeAcento from '../../utils/removeAcento';
+
 import Participants from './services/Participants';
+
+import removeAcento from '../utils/removeAcento';
+import selectMusics from '../utils/selectMusics';
+
+import musics from '../musics/musics';
 
 class Musix {
   private queueConstruct: IQueueConstructor;
 
-  private musics: ISongDTO[];
+  private queue: Map<string | undefined, IQueueConstructor>;
 
   private artistFlag: boolean;
 
   private songFlag: boolean;
 
   constructor() {
-    this.queueConstruct = {
+    this.queue = new Map();
+  }
+
+  public getServerFlagPlay(serverId: string | undefined): boolean | undefined {
+    return this.queue.get(serverId)?.playing;
+  }
+
+  public async run(message: Message): Promise<void> {
+    const queueConstruct: IQueueConstructor = {
       textChannel: null,
       voiceChannel: null,
       connection: undefined,
       songs: [],
+      artistFlag: false,
+      songFlag: false,
       volume: 5,
-      playing: true,
+      playing: false,
+      participants: [],
     };
 
-    this.musics = [
-      {
-        title: 'T - L',
-        url: 'https://www.youtube.com/watch?v=iZq0u3quAqo',
-      },
-      {
-        title: 'K - B',
-        url: 'https://www.youtube.com/watch?v=jHs9VKS_DGg',
-      },
-    ];
+    this.queue.set(message.guild?.id, queueConstruct);
 
-    this.artistFlag = false;
-    this.songFlag = false;
-  }
-
-  public async run(message: Message): Promise<void> {
     const voiceChannel = message.member?.voice.channel;
+    const textChannel = message.channel;
 
-    if (!voiceChannel) {
+    if (!voiceChannel || !textChannel) {
       message.channel.send('Entre em um chat');
       return;
     }
 
-    const textChannel = message.channel;
+    queueConstruct.textChannel = textChannel;
+    queueConstruct.voiceChannel = voiceChannel;
+    queueConstruct.songs = selectMusics(musics);
+    queueConstruct.participants = Participants.setParticipants(voiceChannel);
 
-    if (!textChannel) {
-      message.channel.send('ENTRA AI PORRA');
-    }
-
-    this.queueConstruct.textChannel = textChannel;
-    this.queueConstruct.voiceChannel = voiceChannel;
-    this.queueConstruct.songs = this.musics;
-
-    Participants.setParticipants(voiceChannel);
+    console.log(this.queue.get(message.guild?.id));
 
     try {
-      this.queueConstruct.connection = await voiceChannel?.join();
+      queueConstruct.connection = await voiceChannel?.join();
+      queueConstruct.playing = true;
 
-      Play.playSong(this.queueConstruct);
+      Commands.play(queueConstruct);
     } catch (err) {
       message.channel.send('I NEED PERMITIONS');
     }
@@ -73,7 +71,7 @@ class Musix {
     const voiceChannel = message.member?.voice.channel;
 
     if (!voiceChannel) {
-      message.channel.send('Entre em um chat');
+      message.channel.send(`${message.author}, entre em um chat para jogar!`);
       return;
     }
 
@@ -81,23 +79,29 @@ class Musix {
 
     const messageFormatted = removeAcento(messageLowerCased);
 
-    const args = this.musics[0].title.split(' - ');
+    const constructor = this.queue.get(message.guild?.id);
 
-    const artist = removeAcento(args[0].toLowerCase());
-    const music = removeAcento(args[1].toLowerCase());
+    if (constructor) {
+      const song = constructor.songs[0].title.split(' - ');
 
-    if (messageFormatted === artist && !this.artistFlag) {
-      message.react('🎤');
-      this.artistFlag = true;
+      const artist = removeAcento(song[0].toLowerCase());
+      const music = removeAcento(song[1].toLowerCase());
 
-      Participants.sumParticipantPoints(message.author.username);
-    } else if (messageFormatted === music && !this.songFlag) {
-      message.react('🎶');
-      this.songFlag = true;
+      if (messageFormatted === artist && constructor.artistFlag === false) {
+        message.react('🎤');
+        constructor.artistFlag = true;
+      } else if (messageFormatted === music && constructor.songFlag === false) {
+        message.react('🎶');
+        constructor.songFlag = true;
+      } else {
+        message.react('❌');
+      }
 
-      Participants.sumParticipantPoints(message.author.username);
-    } else {
-      message.react('❌');
+      if (constructor.artistFlag && constructor.songFlag) {
+        Commands.skip(constructor);
+        constructor.artistFlag = false;
+        constructor.songFlag = false;
+      }
     }
   }
 }

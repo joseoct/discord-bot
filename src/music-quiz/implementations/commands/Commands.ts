@@ -1,29 +1,20 @@
 import { StreamDispatcher } from 'discord.js';
 import ytdl from 'ytdl-core';
-import ffmpeg from 'fluent-ffmpeg';
-import fs from 'fs';
 
 import ISongDTO from '../../dtos/ISongDTO';
 
 import IQueueConstructor from '../../models/IQueueConstructor';
 import Participants from '../services/Participants';
 
-class Play {
-  private musixFlag: boolean;
+class Commands {
+  public skip(queueConstruct: IQueueConstructor): void {
+    const { connection } = queueConstruct;
 
-  constructor() {
-    this.musixFlag = false;
+    // eslint-disable-next-line no-unused-expressions
+    connection?.dispatcher.end();
   }
 
-  public getMusixFlag(): boolean {
-    return this.musixFlag;
-  }
-
-  public setMusixFlag(value: boolean): void {
-    this.musixFlag = value;
-  }
-
-  public playSong(queueConstruct: IQueueConstructor): void {
+  public play(queueConstruct: IQueueConstructor): void {
     const { textChannel, voiceChannel, connection } = queueConstruct;
 
     if (!textChannel || !voiceChannel || !connection) {
@@ -34,6 +25,7 @@ class Play {
 
     if (!song) {
       const champion = Participants.getChampionParticipant();
+      queueConstruct.playing = false;
 
       textChannel.send({
         embed: {
@@ -45,23 +37,8 @@ class Play {
 
       voiceChannel.leave();
 
-      this.musixFlag = false;
-
       return;
     }
-
-    const currentSong = fs.createWriteStream('video.mp3');
-
-    ffmpeg()
-      .input(
-        ytdl(song.url, {
-          filter: 'audioonly',
-        }),
-      )
-      .format('mp3')
-      .seekInput(120)
-      .duration(30)
-      .pipe(currentSong);
 
     const participants = Participants.getParticipants();
 
@@ -95,7 +72,7 @@ class Play {
         });
 
         queueConstruct.songs.shift();
-        this.playSong(queueConstruct);
+        this.play(queueConstruct);
       });
 
     setTimeout(() => {
@@ -106,4 +83,4 @@ class Play {
   }
 }
 
-export default new Play();
+export default new Commands();

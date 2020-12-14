@@ -13,7 +13,7 @@ class Participant {
     return this.participants;
   }
 
-  public setParticipants(voiceChannel: VoiceChannel | null): void {
+  public setParticipants(voiceChannel: VoiceChannel | null): IParticipant[] {
     const mems = voiceChannel?.members;
 
     if (!mems) {
@@ -29,6 +29,8 @@ class Participant {
         };
       })
       .filter(mem => mem.name !== 'Musix');
+
+    return this.participants;
   }
 
   public sumParticipantPoints(payload: string): void {
