@@ -11,13 +11,7 @@ import selectMusics from '../utils/selectMusics';
 import musics from '../musics/musics';
 
 class Musix {
-  private queueConstruct: IQueueConstructor;
-
   private queue: Map<string | undefined, IQueueConstructor>;
-
-  private artistFlag: boolean;
-
-  private songFlag: boolean;
 
   constructor() {
     this.queue = new Map();
@@ -55,8 +49,6 @@ class Musix {
     queueConstruct.songs = selectMusics(musics);
     queueConstruct.participants = Participants.setParticipants(voiceChannel);
 
-    console.log(this.queue.get(message.guild?.id));
-
     try {
       queueConstruct.connection = await voiceChannel?.join();
       queueConstruct.playing = true;
@@ -90,9 +82,23 @@ class Musix {
       if (messageFormatted === artist && constructor.artistFlag === false) {
         message.react('🎤');
         constructor.artistFlag = true;
+
+        constructor.participants.find(participant => {
+          if (participant.name === message.author.username)
+            participant.points += 1;
+          return participant;
+        });
+
+        console.log(constructor.participants);
       } else if (messageFormatted === music && constructor.songFlag === false) {
         message.react('🎶');
         constructor.songFlag = true;
+
+        constructor.participants.find(participant => {
+          if (participant.name === message.author.username)
+            participant.points += 1;
+          return participant;
+        });
       } else {
         message.react('❌');
       }
