@@ -71,6 +71,9 @@ class Commands {
           },
         });
 
+        queueConstruct.artistFlag = false;
+        queueConstruct.songFlag = false;
+
         queueConstruct.songs.shift();
         this.play(queueConstruct);
       });

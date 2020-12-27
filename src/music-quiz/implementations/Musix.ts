@@ -6,7 +6,7 @@ import IQueueConstructor from '../models/IQueueConstructor';
 import Participants from './services/Participants';
 
 import removeAcento from '../utils/removeAcento';
-import selectMusics from '../utils/selectMusics';
+import generateDistinctArray from '../utils/selectMusics';
 
 import musics from '../musics/musics';
 
@@ -46,7 +46,7 @@ class Musix {
 
     queueConstruct.textChannel = textChannel;
     queueConstruct.voiceChannel = voiceChannel;
-    queueConstruct.songs = selectMusics(musics);
+    queueConstruct.songs = generateDistinctArray(musics);
     queueConstruct.participants = Participants.setParticipants(voiceChannel);
 
     try {
@@ -88,8 +88,6 @@ class Musix {
             participant.points += 1;
           return participant;
         });
-
-        console.log(constructor.participants);
       } else if (messageFormatted === music && constructor.songFlag === false) {
         message.react('🎶');
         constructor.songFlag = true;

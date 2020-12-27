@@ -1,4 +1,4 @@
-export default interface ISong {
+export default interface ISongDTO {
   title: string;
   url: string;
 }

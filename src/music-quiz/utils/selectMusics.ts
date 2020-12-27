@@ -1,29 +1,16 @@
 import ISongDTO from '../dtos/ISongDTO';
 
-function generateRandomNumberAndVerifyEqual(numbersRandom: number[]): number {
-  const randomNumber = Math.floor(Math.random() * (94 - 0) + 0);
+function generateDistinctArray(musics: ISongDTO[]): ISongDTO[] {
+  const nums = new Set<number>();
+  const arrMusics: ISongDTO[] = [];
 
-  const findNumber = numbersRandom.find(number => number === randomNumber);
-
-  if (!findNumber) {
-    return randomNumber;
-  }
-  return generateRandomNumberAndVerifyEqual(numbersRandom);
-}
-
-function selectMusics(musics: ISongDTO[]): ISongDTO[] {
-  const selectedMusics = [];
-  const numbersRandom = [];
-
-  for (let i = 0; i < 2; i += 1) {
-    const randomNumber = generateRandomNumberAndVerifyEqual(numbersRandom);
-
-    numbersRandom.push(randomNumber);
-
-    selectedMusics.push(musics[randomNumber]);
+  while (nums.size !== 10) {
+    nums.add(Math.floor(Math.random() * 100) + 1);
   }
 
-  return selectedMusics;
+  nums.forEach(item => arrMusics.push(musics[item]));
+
+  return arrMusics;
 }
 
-export default selectMusics;
+export default generateDistinctArray;
