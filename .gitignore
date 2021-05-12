@@ -3,7 +3,7 @@
 node_modules/
 build/
 temp/
-discordConfig
+config.ts
 
 tmp/*
 !tmp/.gitkeep

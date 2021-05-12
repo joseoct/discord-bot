@@ -31,7 +31,10 @@ class Commands {
         embed: {
           color: 10181046,
           title: `🥇Campeão: ${champion.name}🥇`,
-          description: `com ${champion.points} pontos!!!`,
+          description:
+            champion.points === 1
+              ? `com ${champion.points} ponto!!!`
+              : `com ${champion.points} pontos!!!`,
         },
       });
 

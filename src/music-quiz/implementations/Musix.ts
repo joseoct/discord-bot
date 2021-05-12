@@ -84,18 +84,20 @@ class Musix {
         constructor.artistFlag = true;
 
         constructor.participants.find(participant => {
-          if (participant.name === message.author.username)
+          if (participant.name === message.author.username) {
             participant.points += 1;
-          return participant;
+            return participant;
+          }
         });
       } else if (messageFormatted === music && constructor.songFlag === false) {
         message.react('🎶');
         constructor.songFlag = true;
 
         constructor.participants.find(participant => {
-          if (participant.name === message.author.username)
+          if (participant.name === message.author.username) {
             participant.points += 1;
-          return participant;
+            return participant;
+          }
         });
       } else {
         message.react('❌');
