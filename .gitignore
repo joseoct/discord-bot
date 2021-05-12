@@ -4,6 +4,7 @@ node_modules/
 build/
 temp/
 config.ts
+config.js
 
 tmp/*
 !tmp/.gitkeep
