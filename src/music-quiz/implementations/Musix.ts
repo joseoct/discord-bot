@@ -1,4 +1,6 @@
 import { Message } from 'discord.js';
+import stringSimilarity from 'string-similarity';
+
 import Commands from './commands/Commands';
 
 import IQueueConstructor from '../models/IQueueConstructor';
@@ -48,6 +50,7 @@ class Musix {
     queueConstruct.voiceChannel = voiceChannel;
     queueConstruct.songs = generateDistinctArray(musics);
     queueConstruct.participants = Participants.setParticipants(voiceChannel);
+    console.log(queueConstruct.songs);
 
     try {
       queueConstruct.connection = await voiceChannel?.join();
@@ -79,7 +82,17 @@ class Musix {
       const artist = removeAcento(song[0].toLowerCase());
       const music = removeAcento(song[1].toLowerCase());
 
-      if (messageFormatted === artist && constructor.artistFlag === false) {
+      const artistSimilarity = stringSimilarity.compareTwoStrings(
+        messageFormatted,
+        artist,
+      );
+
+      const songSimilarity = stringSimilarity.compareTwoStrings(
+        messageFormatted,
+        music,
+      );
+
+      if (artistSimilarity >= 0.85 && constructor.artistFlag === false) {
         message.react('🎤');
         constructor.artistFlag = true;
 
@@ -88,8 +101,9 @@ class Musix {
             participant.points += 1;
             return participant;
           }
+          return 1;
         });
-      } else if (messageFormatted === music && constructor.songFlag === false) {
+      } else if (songSimilarity >= 0.85 && constructor.songFlag === false) {
         message.react('🎶');
         constructor.songFlag = true;
 
@@ -98,6 +112,7 @@ class Musix {
             participant.points += 1;
             return participant;
           }
+          return 1;
         });
       } else {
         message.react('❌');
