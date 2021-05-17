@@ -45,10 +45,15 @@ class Participant {
     findParticipant.points += 1;
   }
 
-  public getChampionParticipant(): IParticipant {
+  public getChampionParticipant(): IParticipant | null {
     const points = this.participants.map(participant => participant.points);
 
     const maxPoint = Math.max.apply(null, points);
+
+    const duplicates =
+      points.lastIndexOf(maxPoint) === points.indexOf(maxPoint);
+
+    if (!duplicates) return null;
 
     const champion = this.participants.find(
       participant => participant.points === maxPoint,

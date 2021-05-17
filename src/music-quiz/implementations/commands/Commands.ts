@@ -22,10 +22,20 @@ class Commands {
     }
 
     const song: ISongDTO = queueConstruct.songs[0];
+    const indexSong: number = 11 - queueConstruct.songs.length;
 
     if (!song) {
       const champion = Participants.getChampionParticipant();
-      queueConstruct.playing = false;
+
+      if (!champion) {
+        textChannel.send({
+          embed: {
+            color: 10181046,
+            title: 'Empatouuuuuuu',
+          },
+        });
+        return;
+      }
 
       textChannel.send({
         embed: {
@@ -38,6 +48,7 @@ class Commands {
         },
       });
 
+      queueConstruct.playing = false;
       voiceChannel.leave();
 
       return;
@@ -58,7 +69,7 @@ class Commands {
         textChannel.send({
           embed: {
             color: 10181046,
-            title: `**${song.title}**`,
+            title: `${indexSong.toString()}) ${song.title}`,
           },
         });
 

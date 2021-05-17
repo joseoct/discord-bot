@@ -50,13 +50,30 @@ class Musix {
     queueConstruct.voiceChannel = voiceChannel;
     queueConstruct.songs = generateDistinctArray(musics);
     queueConstruct.participants = Participants.setParticipants(voiceChannel);
-    console.log(queueConstruct.songs);
 
     try {
       queueConstruct.connection = await voiceChannel?.join();
       queueConstruct.playing = true;
 
-      Commands.play(queueConstruct);
+      textChannel.send({
+        embed: {
+          color: 10181046,
+          title: 'Como o jogo funciona',
+          description:
+            'Irá tocar uma playlist com 10 músicas, cada música terá 30 segundos de duração, tente descobrir o nome da música e do artista que está tocando, não precisa digitar exatamente o nome para acertar.',
+        },
+      });
+
+      textChannel.send({
+        embed: {
+          color: 10181046,
+          title: 'O jogo começará em 5 segundos !!!',
+        },
+      });
+
+      setTimeout(() => {
+        Commands.play(queueConstruct);
+      }, 5000);
     } catch (err) {
       message.channel.send('I NEED PERMITIONS');
     }
@@ -92,7 +109,7 @@ class Musix {
         music,
       );
 
-      if (artistSimilarity >= 0.85 && constructor.artistFlag === false) {
+      if (artistSimilarity >= 0.8 && constructor.artistFlag === false) {
         message.react('🎤');
         constructor.artistFlag = true;
 
@@ -101,9 +118,8 @@ class Musix {
             participant.points += 1;
             return participant;
           }
-          return 1;
         });
-      } else if (songSimilarity >= 0.85 && constructor.songFlag === false) {
+      } else if (songSimilarity >= 0.8 && constructor.songFlag === false) {
         message.react('🎶');
         constructor.songFlag = true;
 
@@ -112,7 +128,6 @@ class Musix {
             participant.points += 1;
             return participant;
           }
-          return 1;
         });
       } else {
         message.react('❌');

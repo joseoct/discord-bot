@@ -5,6 +5,7 @@ build/
 temp/
 config.ts
 dist
+backup.ts
 
 tmp/*
 !tmp/.gitkeep
