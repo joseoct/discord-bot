@@ -14,8 +14,6 @@ export default class DiscordBot {
 
   private musix = new Musix();
 
-  private musicCounter = 0;
-
   constructor() {
     this.client = new Client();
 
