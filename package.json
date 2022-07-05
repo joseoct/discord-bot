@@ -20,7 +20,7 @@
     "typescript": "^3.9.2"
   },
   "dependencies": {
-    "@discordjs/opus": "^0.3.2",
+    "@discordjs/opus": "^0.8.0",
     "@typeit/discord": "^4.0.4",
     "@types/bcryptjs": "^2.4.2",
     "@types/fluent-ffmpeg": "^2.1.16",
